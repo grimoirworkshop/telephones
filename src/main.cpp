@@ -17,7 +17,7 @@ OneButton button13(7, true);
 OneButton button14(12, true);
 uint8_t vol1 =30;
 uint8_t vol2 =2;
-uint8_t timer = 0;
+unsigned long timer = 0;
 void ring1();
 void ring2();
 void ring3();
@@ -87,11 +87,14 @@ void setup() {
    // Serial.print(1);
     myDFPlayer.volume(30);
       
-     // myDFPlayer.loop(1);
+  
       
 }
 
 void loop() {
+  if (timer < (millis()+15000)){
+  stop();
+}
 button1.tick();
 button2.tick();
 button3.tick();
@@ -100,11 +103,7 @@ button11.tick();
 button12.tick();
 button13.tick();
 button14.tick();
-button1.tick();
-button2.tick();
-button3.tick();
-button4.tick();
-if (timer ==millis()) stop();
+
 }
 void stop(){
     digitalWrite(A0, HIGH);
@@ -120,7 +119,7 @@ void ring1(){
 switch (state)
 {
 case 0:
-    timer = millis()+15000;
+    timer = millis();
     digitalWrite(A0, LOW);
     myDFPlayer.volume(vol1);
     myDFPlayer.loop(5);
@@ -136,7 +135,7 @@ void ring2(){
 switch (state)
 {
 case 0:
-    timer = millis()+15000;
+    timer = millis();
     digitalWrite(A1, LOW);
     myDFPlayer.volume(vol1);
     myDFPlayer.loop(5);
@@ -154,7 +153,7 @@ void ring3(){
 switch (state)
 {
 case 0:
-    timer = millis()+15000;
+    timer = millis();
     digitalWrite(A2, LOW);
     myDFPlayer.volume(vol1);
     myDFPlayer.loop(5);
@@ -171,7 +170,7 @@ void ring4(){
 switch (state)
 {
 case 0:
-    timer = millis()+15000;
+    timer = millis();
     digitalWrite(A3, LOW);
     myDFPlayer.volume(vol1);
     myDFPlayer.loop(5);
@@ -186,25 +185,25 @@ default:
 }
 
 void play1(){
-  timer = millis()+15000;
+  timer = millis();
     myDFPlayer.stop();
     myDFPlayer.volume(vol2);
   myDFPlayer.play(1);
 }
 void play2(){
-  timer = millis()+15000;
+  timer = millis();
     myDFPlayer.stop();
     myDFPlayer.volume(vol2);
   myDFPlayer.play(2);
 }
 void play3(){
-  timer = millis()+15000;
+  timer = millis();
     myDFPlayer.stop();
     myDFPlayer.volume(vol2);
   myDFPlayer.play(3);
 }
 void play4(){
-  timer = millis()+15000;
+  timer = millis();
     myDFPlayer.stop();
     myDFPlayer.volume(vol2);
   myDFPlayer.play(4);
