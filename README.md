@@ -1,7 +1,8 @@
 # telephones
 
 
-the working and tested version is from about a month ago; right before a big gap in commit dates
+the working and tested version is from about a month ago; right before a big gap in commit dates, all versions after that are irrelevant though some may work
+
 to build in platformIO
 
 OneButton button1(2, true);
