@@ -1,9 +1,12 @@
 #include <Arduino.h>
-#include "DFRobotDFPlayerMini.h"
+#if !defined(UBRR1H)
+#include <FireTimer.h>
 #include <SoftwareSerial.h>
-#define FPSerial softSerial
-SoftwareSerial softSerial(/*rx =*/10, /*tx =*/11);
-DFRobotDFPlayerMini myDFPlayer;
+#include <DFPlayerMini_Fast.h>
+//#include <DFRobotDFPlayerMini.h>
+SoftwareSerial mySerial(4, 0); // RX, TX
+#endif
+DFPlayerMini_Fast myDFPlayer;
 // put function declarations here:
 #include "OneButton.h"
 // Setup a new OneButton on pin A1.  
@@ -30,7 +33,6 @@ void stop();
 uint8_t state = 0;
 void setup() {
 
-    softSerial.begin(9600);
     pinMode(A0, OUTPUT);
     digitalWrite(A0, HIGH);
     pinMode(A1, OUTPUT);
@@ -55,46 +57,37 @@ void setup() {
   button12.attachLongPressStart(stop);
   button13.attachLongPressStart(stop);
   button14.attachLongPressStart(stop);
-  button1.setPressTicks(100);
-  button2.setPressTicks(100);
-  button3.setPressTicks(100);
-  button4.setPressTicks(100);
-  myDFPlayer.begin(FPSerial,true, true);
-   digitalWrite(A0, LOW);
-   digitalWrite(A1, LOW);
-   digitalWrite(A2, LOW);
-   digitalWrite(A3, LOW);
-   delay(2000);
-      stop();
-    /*
-    Serial.begin(115200);
+  button1.setPressTicks(50);
+  button2.setPressTicks(50);
+  button3.setPressTicks(50);
+  button4.setPressTicks(50);
+  digitalWrite(A0, LOW);
+  digitalWrite(A1, LOW);
+  digitalWrite(A2, LOW);
+  digitalWrite(A3, LOW);
 
-  Serial.println();
-  Serial.println(F("DFRobot DFPlayer Mini Demo"));
-  Serial.println(F("Initializing DFPlayer ... (May take 3~5 seconds)"));
+#if !defined(UBRR1H)
+  mySerial.begin(9600);
+  delay(1000);
   
-  if (!) {  //Use serial to communicate with mp3.
-    Serial.println(F("Unable to begin:"));
-    Serial.println(F("1.Please recheck the connection!"));
-    Serial.println(F("2.Please insert the SD card!"));
-    while(true){
-      delay(0); // Code to compatible with ESP8266 watch dog.
-    }
+  myDFPlayer.begin(mySerial, true);
+#else
+  Serial1.begin(9600);
+  myMP3.begin(Serial1, true);
+#endif
+   delay(1000);
+      stop();
     
-  }*/
-   myDFPlayer.enableDAC(); 
-    //myDFPlayer.outputSetting(true, 15);
+  //myDFPlayer.outputSetting(true, 15);
    // Serial.print(1);
     myDFPlayer.volume(30);
-      
+    //myDFPlayer.normalMode();
   
       
 }
 
 void loop() {
-  if (timer < (millis()+15000)){
-  stop();
-}
+  
 button1.tick();
 button2.tick();
 button3.tick();
@@ -104,6 +97,9 @@ button12.tick();
 button13.tick();
 button14.tick();
 
+if ((timer+15000)<millis()) {
+  stop();
+}
 }
 void stop(){
     digitalWrite(A0, HIGH);
@@ -111,23 +107,26 @@ void stop(){
     digitalWrite(A2, HIGH);
     digitalWrite(A3, HIGH);
     state = 0;
-    myDFPlayer.stop();
-
+    //if (timer != 0) myDFPlayer.stop();
+    timer = 0;
+    
 }
 // put function definitions here:
 void ring1(){
 switch (state)
 {
 case 0:
+    stop();
     timer = millis();
     digitalWrite(A0, LOW);
     myDFPlayer.volume(vol1);
-    myDFPlayer.loop(5);
+    myDFPlayer.playFolder(01, 05);
     state = 1;
     break;
 
 default:
     stop();
+    state = 0;
     break;
 }
 }
@@ -135,14 +134,17 @@ void ring2(){
 switch (state)
 {
 case 0:
+  
+    stop();
     timer = millis();
     digitalWrite(A1, LOW);
     myDFPlayer.volume(vol1);
-    myDFPlayer.loop(5);
+    myDFPlayer.playFolder(01, 05);
     state = 1;
     break;
 
 default:
+state = 0;
     stop();
 
     break;
@@ -153,15 +155,16 @@ void ring3(){
 switch (state)
 {
 case 0:
+    stop();
     timer = millis();
     digitalWrite(A2, LOW);
     myDFPlayer.volume(vol1);
-    myDFPlayer.loop(5);
+    myDFPlayer.playFolder(01, 05);
     state = 1;
     break;
 
 default:
-    stop();
+    state = 0;   stop();
 
     break;
 }
@@ -170,14 +173,16 @@ void ring4(){
 switch (state)
 {
 case 0:
+    stop();
     timer = millis();
     digitalWrite(A3, LOW);
     myDFPlayer.volume(vol1);
-    myDFPlayer.loop(5);
+    myDFPlayer.playFolder(01, 05);
     state = 1;
     break;
 
 default:
+state = 0;
     stop();
 
     break;
@@ -185,26 +190,27 @@ default:
 }
 
 void play1(){
-  timer = millis();
-    myDFPlayer.stop();
+ //if (timer != 0) myDFPlayer.stop();
+  timer = millis()+30000;
     myDFPlayer.volume(vol2);
-  myDFPlayer.play(1);
+  myDFPlayer.playFolder(1, 1);
 }
 void play2(){
-  timer = millis();
-    myDFPlayer.stop();
+  //if (timer!=0) myDFPlayer.stop();
+  timer = millis()+30000;
     myDFPlayer.volume(vol2);
-  myDFPlayer.play(2);
+  myDFPlayer.playFolder(01, 02);
 }
 void play3(){
-  timer = millis();
-    myDFPlayer.stop();
+  //if (timer != 0) myDFPlayer.stop();
+  timer = millis()+30000;
     myDFPlayer.volume(vol2);
-  myDFPlayer.play(3);
+  myDFPlayer.playFolder(01, 03);
 }
 void play4(){
-  timer = millis();
-    myDFPlayer.stop();
+  
+  //if (timer != 0) myDFPlayer.stop();
+  timer = millis()+30000;
     myDFPlayer.volume(vol2);
-  myDFPlayer.play(4);
-}
+  myDFPlayer.playFolder(01, 04);
+} 
